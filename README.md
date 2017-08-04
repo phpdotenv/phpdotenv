@@ -1,0 +1,2 @@
+# phpdotenv
+Load environment variables.
