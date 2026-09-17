@@ -6,6 +6,7 @@ namespace Dotenv\Tests;
 
 use Dotenv\Dotenv;
 use Dotenv\Exception\InvalidEncodingException;
+use Dotenv\Exception\InvalidFileException;
 use Dotenv\Exception\InvalidPathException;
 use Dotenv\Loader\Loader;
 use Dotenv\Parser\Parser;
@@ -448,6 +449,30 @@ final class DotenvTest extends TestCase
             ['A' => "one # data\ntwo", 'B' => '2'],
             Dotenv::parse("A=\"one # data\ntwo\"\nB=2")
         );
+    }
+
+    public function testDotenvParseUnterminatedDoubleQuote()
+    {
+        $this->expectException(InvalidFileException::class);
+        $this->expectExceptionMessage('Encountered a missing closing quote at ["bar].');
+
+        Dotenv::parse('FOO="bar');
+    }
+
+    public function testDotenvParseUnterminatedDoubleQuoteDoesNotSwallowLaterLines()
+    {
+        $this->expectException(InvalidFileException::class);
+        $this->expectExceptionMessage('Encountered a missing closing quote at ["oops].');
+
+        Dotenv::parse("A=\"oops\nB=keep");
+    }
+
+    public function testDotenvParseUnterminatedDoubleQuoteMatchesSingleQuote()
+    {
+        $this->expectException(InvalidFileException::class);
+        $this->expectExceptionMessage('Encountered a missing closing quote at [\'bar].');
+
+        Dotenv::parse("FOO='bar");
     }
 
     public function testDotenvParseEmptyCase()
