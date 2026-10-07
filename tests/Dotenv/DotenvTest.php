@@ -302,7 +302,7 @@ final class DotenvTest extends TestCase
 
     public function testDotenvUnsafeLoadWithNullByteValueDoesNotThrow()
     {
-        $dotenv = Dotenv::createUnsafeImmutable(self::$folder, 'nul.env');
+        $dotenv = Dotenv::createUnsafeImmutable(self::$folder, 'nullbyte.env');
 
         self::assertSame([], $dotenv->safeLoad());
         self::assertFalse(\getenv('NULVAL'));
