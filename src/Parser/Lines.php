@@ -116,11 +116,7 @@ final class Lines
      */
     private static function looksLikeMultilineStop(string $line, bool $started)
     {
-        if ($line === '"') {
-            return true;
-        }
-
-        return Regex::occurrences('/(?=([^\\\\]"))/', \str_replace('\\\\', '', $line))->map(static function (int $count) use ($started) {
+        return Regex::occurrences('/(?<!\\\\)"/', \str_replace('\\\\', '', $line))->map(static function (int $count) use ($started) {
             return $started ? $count > 1 : $count >= 1;
         })->success()->getOrElse(false);
     }
