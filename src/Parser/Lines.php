@@ -43,6 +43,13 @@ final class Lines
             }
         }
 
+        // The input ended while still within a multiline value. Emit what was
+        // buffered, so that the parser reports the missing closing quote,
+        // instead of discarding this entry and every line that followed it.
+        if ($multiline) {
+            $output[] = \implode("\n", $multilineBuffer);
+        }
+
         return $output;
     }
 
