@@ -43,6 +43,11 @@ final class Lines
             }
         }
 
+        // Emit an unterminated multiline value so the parser reports the missing quote.
+        if ($multiline) {
+            $output[] = \implode("\n", $multilineBuffer);
+        }
+
         return $output;
     }
 

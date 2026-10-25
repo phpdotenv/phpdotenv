@@ -50,4 +50,9 @@ final class LinesTest extends TestCase
 
         self::assertSame($expected, Lines::process($result->success()->get()));
     }
+
+    public function testProcessUnterminated()
+    {
+        self::assertSame(["A=\"oops\nB=keep"], Lines::process(['A="oops', 'B=keep']));
+    }
 }

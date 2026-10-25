@@ -207,10 +207,11 @@ MESSAGE="Hello
 World"
 ```
 
-A double-quoted value left unterminated at the end of the file is currently
-discarded silently, along with any lines that follow it. A line consisting of
-just a variable name with no equals sign will clear that variable from the
-environment when loading in mutable mode.
+A double-quoted value left unterminated at the end of the file is a parse
+error, reported as a missing closing quote, just like an unterminated
+single-quoted value. A line consisting of just a variable name with no equals
+sign will clear that variable from the environment when loading in mutable
+mode.
 
 
 ### Immutability and Repository Customization
