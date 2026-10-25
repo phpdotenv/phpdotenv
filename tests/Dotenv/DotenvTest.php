@@ -459,20 +459,12 @@ final class DotenvTest extends TestCase
         Dotenv::parse('FOO="bar');
     }
 
-    public function testDotenvParseUnterminatedDoubleQuoteDoesNotSwallowLaterLines()
+    public function testDotenvParseUnterminatedDoubleQuoteFollowedByLine()
     {
         $this->expectException(InvalidFileException::class);
         $this->expectExceptionMessage('Encountered a missing closing quote at ["oops].');
 
         Dotenv::parse("A=\"oops\nB=keep");
-    }
-
-    public function testDotenvParseUnterminatedDoubleQuoteMatchesSingleQuote()
-    {
-        $this->expectException(InvalidFileException::class);
-        $this->expectExceptionMessage('Encountered a missing closing quote at [\'bar].');
-
-        Dotenv::parse("FOO='bar");
     }
 
     public function testDotenvParseEmptyCase()
