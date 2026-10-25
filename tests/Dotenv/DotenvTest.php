@@ -451,6 +451,22 @@ final class DotenvTest extends TestCase
         );
     }
 
+    public function testDotenvParseMultilineClosingQuoteFollowedByComment()
+    {
+        self::assertSame(
+            ['A' => "one\n", 'B' => '2'],
+            Dotenv::parse("A=\"one\n\" # close\nB=2")
+        );
+    }
+
+    public function testDotenvParseMultilineClosingQuoteFollowedByWhitespace()
+    {
+        self::assertSame(
+            ['A' => "one\n", 'B' => '2'],
+            Dotenv::parse("A=\"one\n\"  \nB=2")
+        );
+    }
+
     public function testDotenvParseUnterminatedDoubleQuote()
     {
         $this->expectException(InvalidFileException::class);
