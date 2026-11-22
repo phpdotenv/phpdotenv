@@ -56,6 +56,30 @@ final class LoaderTest extends TestCase
         $loader->load($repository, (new Parser())->parse('FOO="""'));
     }
 
+    public function testLoaderResolvesVariablesCompletedByNestedVariables()
+    {
+        $adapter = ArrayAdapter::create()->get();
+        $repository = RepositoryBuilder::createWithNoAdapters()->addReader($adapter)->addWriter($adapter)->make();
+        $loader = new Loader();
+
+        $content = "A=FOO\nB=BAR\nFOOBAR=baz\nX_FOO=qux\nOPEN={A}!\nJOINED=\"\${\${A}\${B}}\"\nPREFIXED=\"\${X_\${A}}\"\nOPENED=\"\$\${OPEN}\"";
+        $expected = ['A' => 'FOO', 'B' => 'BAR', 'FOOBAR' => 'baz', 'X_FOO' => 'qux', 'OPEN' => '{A}!', 'JOINED' => 'baz', 'PREFIXED' => 'qux', 'OPENED' => 'FOO!'];
+
+        self::assertSame($expected, $loader->load($repository, (new Parser())->parse($content)));
+    }
+
+    public function testLoaderResolvesVariablesAmongMultibyteCharacters()
+    {
+        $adapter = ArrayAdapter::create()->get();
+        $repository = RepositoryBuilder::createWithNoAdapters()->addReader($adapter)->addWriter($adapter)->make();
+        $loader = new Loader();
+
+        $content = "A=x\nRESULT=\"€€\${A}😀\${A}é\"";
+        $expected = ['A' => 'x', 'RESULT' => '€€x😀xé'];
+
+        self::assertSame($expected, $loader->load($repository, (new Parser())->parse($content)));
+    }
+
     public function testLoaderPreservesInvalidUtf8BytesFromRepositoryValues()
     {
         $adapter = ArrayAdapter::create()->get();
@@ -64,6 +88,18 @@ final class LoaderTest extends TestCase
 
         $content = "LEFT=left\nBAD=\xC3\nRESULT=\"\${LEFT}\${BAD}\"";
         $expected = ['LEFT' => 'left', 'BAD' => "\xC3", 'RESULT' => "left\xC3"];
+
+        self::assertSame($expected, $loader->load($repository, (new Parser())->parse($content)));
+    }
+
+    public function testLoaderPreservesInvalidUtf8BytesAroundVariables()
+    {
+        $adapter = ArrayAdapter::create()->get();
+        $repository = RepositoryBuilder::createWithNoAdapters()->addReader($adapter)->addWriter($adapter)->make();
+        $loader = new Loader();
+
+        $content = "LEFT=left\nRESULT=\"\xC3 \${LEFT}\xC3\"";
+        $expected = ['LEFT' => 'left', 'RESULT' => "\xC3 left\xC3"];
 
         self::assertSame($expected, $loader->load($repository, (new Parser())->parse($content)));
     }
