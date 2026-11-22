@@ -36,7 +36,21 @@ final class Lines
         $multilineBuffer = [];
 
         foreach ($lines as $line) {
-            [$multiline, $line, $multilineBuffer] = self::multilineProcess($multiline, $line, $multilineBuffer);
+            $startsOnCurrentLine = $multiline ? false : self::looksLikeMultilineStart($line);
+
+            if ($startsOnCurrentLine) {
+                $multiline = true;
+            }
+
+            if ($multiline) {
+                $multilineBuffer[] = $line;
+
+                if (self::looksLikeMultilineStop($line, $startsOnCurrentLine)) {
+                    $multiline = false;
+                    $line = \implode("\n", $multilineBuffer);
+                    $multilineBuffer = [];
+                }
+            }
 
             if (!$multiline && !self::isCommentOrWhitespace($line)) {
                 $output[] = $line;
@@ -49,37 +63,6 @@ final class Lines
         }
 
         return $output;
-    }
-
-    /**
-     * Used to make all multiline variable process.
-     *
-     * @param bool     $multiline
-     * @param string   $line
-     * @param string[] $buffer
-     *
-     * @return array{bool,string, string[]}
-     */
-    private static function multilineProcess(bool $multiline, string $line, array $buffer)
-    {
-        $startsOnCurrentLine = $multiline ? false : self::looksLikeMultilineStart($line);
-
-        // check if $line can be multiline variable
-        if ($startsOnCurrentLine) {
-            $multiline = true;
-        }
-
-        if ($multiline) {
-            \array_push($buffer, $line);
-
-            if (self::looksLikeMultilineStop($line, $startsOnCurrentLine)) {
-                $multiline = false;
-                $line = \implode("\n", $buffer);
-                $buffer = [];
-            }
-        }
-
-        return [$multiline, $line, $buffer];
     }
 
     /**
