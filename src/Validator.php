@@ -101,7 +101,7 @@ class Validator
     {
         return $this->assertNullable(
             static function (string $value) {
-                if ($value === '') {
+                if (\trim($value, " \n\r\t\0\x0B") === '') {
                     return false;
                 }
 

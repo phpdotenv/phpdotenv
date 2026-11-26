@@ -275,6 +275,8 @@ final class ValidatorTest extends TestCase
             ['INVALID_MINUS'],
             ['INVALID_TILDA'],
             ['INVALID_EXCLAMATION'],
+            ['INVALID_SPACES'],
+            ['INVALID_TAB'],
         ];
     }
 
